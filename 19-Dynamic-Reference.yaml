@@ -1,0 +1,30 @@
+Metadata:
+   AWS::CloudFormation::Interface:
+        ParameterGroups: 
+          - Label: 
+              Default: EC2 configurations
+            Parameters: 
+              - InstanceType
+        ParameterLabels: 
+            InstanceType: 
+              Default: instance launch 
+
+Parameters: 
+  InstanceType: 
+    Description: Size of instance to launch 
+    Type: String 
+    Default: t3.micro 
+    AllowedValues: 
+       - t3.micro 
+       - t3.medium 
+       - t3.large
+ 
+    
+
+
+Resources:  
+  EC2instance: 
+    Type: AWS::EC2::Instance 
+    Properties: 
+      InstanceType: !Ref InstanceType 
+      ImageId: '{{resolve:ssm:/ubuntufromssm}}'    #{{resolve:service-name:reference-key}}

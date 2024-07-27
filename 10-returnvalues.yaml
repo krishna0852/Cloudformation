@@ -1,0 +1,50 @@
+Metadata: 
+   AWS::CloudFormation::Interface: 
+           ParameterGroups: 
+               - label: 
+                   Default: Bucket configurations
+                 Parameters: 
+                     - BucketName
+           ParameterLables: 
+              BucketName: 
+                 Default: Name of Bucket 
+Parameters: 
+  BucketName:
+    Type: String 
+    Description: Bucket Name 
+
+
+Resources: 
+   S3bucket: 
+      Type: AWS::S3::Bucket 
+      Properties: 
+        BucketName: !Ref BucketName 
+        Tags:
+          - Key: Purpose
+            Value: AWS CloudFormation Workshop
+   S3BucketPolicy: 
+       Type: AWS::S3::BucketPolicy         
+       Properties:
+         Bucket: !Ref S3bucket
+         PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+               - Action:
+                   - s3:*
+                 Effect: Deny
+                 Resource:
+                   - !GetAtt S3bucket.Arn
+                   - !Sub '${S3bucket.Arn}/*'
+                 Principal: '*'
+                 Condition:
+                   Bool:
+                     aws:SecureTransport: false
+
+Outputs: 
+ BucketDomainName: 
+   Description: s3 domain name 
+   Value: !GetAtt S3bucket.DomainName
+ BucketName: 
+   Description: s3 bucket name by logical id
+   Value: !Ref S3bucket 
+   # By default when you do this it will return the bucket name. Similarly, for ec2 it will return instance id 

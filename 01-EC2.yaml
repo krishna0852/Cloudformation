@@ -1,0 +1,6 @@
+Resources: 
+ cf-ec2-instances: # logical id which will point to resource to identify
+   Type: AWS::EC2::INSTANCE 
+   Properties: 
+     ImageId: ami-04a81a99f5ec58529
+     

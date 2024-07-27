@@ -1,0 +1,27 @@
+Metadata: 
+  AWS::CloudFormation::Interface:
+        ParameterGroups: 
+            - Label: 
+                Default: Bucket-configurations
+              Parameters: 
+               - BucketName 
+        ParameterLabels: 
+           BucketName: 
+             Default: Input Bucket Name 
+
+Parameters: 
+   BucketName: 
+     Type: String 
+
+Resources: 
+  s3Bucket: 
+    Type: AWS::S3::Bucket 
+    Properties: 
+      BucketName: !Ref BucketName  
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    DependsOn: s3Bucket
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Resource-dependencies-workshop

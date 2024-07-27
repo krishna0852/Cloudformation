@@ -1,0 +1,27 @@
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: 'EC2 Configuration Parameters'
+        Parameters:
+          - InstanceType
+    ParameterLabels:
+      InstanceType:
+        default: 'Type of EC2 instance to launch'
+
+Parameters:
+  InstanceType:
+    Type: String
+    Description: 'EC2 instance type'
+    Default: t3.micro
+    AllowedValues:
+      - t3.micro
+      - t3.medium
+      - t3.large
+
+Resources:
+  Ec2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: ami-04a81a99f5ec58529

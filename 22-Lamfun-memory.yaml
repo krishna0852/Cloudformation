@@ -1,0 +1,38 @@
+Resources:
+  DemoRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: ssm-least-privilege
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ssm:GetParameter
+                Resource: "*"
+                #defining pseudo parameters which are pre-defined by cloudformation 
+                #eg: AWS::Partition,AWS::Region,AWS::AccountId
+  LamFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Role: !GetAtt DemoRole.Arn
+      Runtime: python3.8
+      MemorySize: '{{resolve:ssm:/LamFunction-memory:1}}' 
+      Code:
+        ZipFile: |
+          import boto3
+          client = boto3.client('ssm')
+          def lambda_handler(event, context):
+               response = client.get_parameter(Name='LamFunction-memory')
+               print(f'SSM dbUsername parameter value: {response["Parameter"]["Value"]}')

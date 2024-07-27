@@ -1,0 +1,33 @@
+Metadata: 
+   AWS::CloudFormation::Interface: 
+           ParameterGroups: 
+               - label: 
+                   Default: EC2 Configurations
+                 Parameters: 
+                     - InstanceType 
+           ParameterLables: 
+              InstanceType: 
+                 Default: Type of ec2 instance 
+
+Parameters: 
+  InstanceType: 
+     Type: String 
+     Description: Size of instance to launch
+     Default: t3.micro 
+     AllowedValues:
+        - t3.micro 
+        - t3.medium 
+        - t3.large
+
+Outputs: 
+  InstancePublicDNSName: 
+     Description: PublicDnsName 
+     Value: !GetAtt Ec2Instance.PublicDnsName
+
+
+Resources: 
+  Ec2Instance: 
+    Type: AWS::EC2::Instance 
+    Properties: 
+       InstanceType: !Ref InstanceType
+       ImageId: ami-04a81a99f5ec58529

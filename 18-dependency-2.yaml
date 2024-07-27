@@ -1,0 +1,63 @@
+Metadata: 
+  AWS::CloudFormation::Interface: 
+     ParameterGroups: 
+        - Label: 
+            Default: EC2 configurations
+          Parameters: 
+            - AmiId 
+            - InstanceType 
+        - Label: 
+            Default: Bucket Configurations
+          Parameters: 
+            - BucketName
+     ParameterLabels: 
+         AmiId: 
+           Default: image that needs to launch 
+         InstanceType: 
+           Default: size of instance to launch 
+
+Parameters: 
+  AmiId: 
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Description: Type of OS to launch 
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+  InstanceType: 
+    Type: String 
+    Default: t3.micro 
+    AllowedValues: 
+      - t3.micro 
+      - t3.medium 
+  BucketName:
+    Type: String 
+    Description: Input Bucket Name
+
+Resources: 
+  Ec2Instance: 
+    Type: AWS::EC2::Instance 
+    Properties: 
+       InstanceType: !Ref InstanceType
+       ImageId: !Ref AmiId
+       SecurityGroupIds: 
+          - !GetAtt SGroup.GroupId
+
+  SGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: Allow http to client host
+      VpcId: vpc-0f9895e367d21b805
+      SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            CidrIp: 0.0.0.0/0 
+      SecurityGroupEgress:
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            CidrIp: 0.0.0.0/0
+  s3Bucket: 
+    Type: AWS::S3::Bucket 
+    DependsOn:  Ec2Instance
+    Properties: 
+      BucketName: !Ref BucketName 
+      

@@ -1,0 +1,52 @@
+Metadata: 
+   AWS::CloudFormation::Interface: 
+           ParameterGroups: 
+                - label: 
+                    Default: Environment Profiles
+                  Parameters: 
+                     - EnvironmentType
+                - label: 
+                    Default: ec2 configurations 
+                  Parameters: 
+                      - imageId 
+           ParametersLabels: 
+                imageId: 
+                   Default: Type of os image to launch 
+                EnvironmentType: 
+                   Default: Specify Environment to Deploy
+
+
+Parameters: 
+  imageId: 
+    Type: AWS::EC2::Image::Id 
+    Description: Input the os image to launch
+  EnvironmentType: 
+    Type: String 
+    Description: Select Environment 
+    Default: Test 
+    AllowedValues: 
+       - Dev
+       - Test 
+       - Int 
+       - Prod
+
+Mappings: 
+   EnvironmentSpecificInstanceType: 
+           Dev:
+             InstanceType: t3.nano
+           Test:
+             InstanceType: t3.micro
+           Int: 
+             InstanceType: t3.medium
+           Prod: 
+             InstanceType: t2.large
+
+Resources: 
+   Ec2Instance: 
+      Type: AWS::EC2::Instance 
+      Properties: 
+         InstanceType: !FindInMap [ EnvironmentSpecificInstanceType, !Ref EnvironmentType, InstanceType]
+         ImageId: !Ref imageId
+         Tags: 
+          -  Key: Name
+             Value:  !Join ['-',[!Ref EnvironmentType, webserver]]

@@ -1,0 +1,62 @@
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          Default: SSM parameters configuration
+        Parameters:
+            - Dbusername
+    ParameterLabels:
+      Dbusername:
+        default: Enter the pasrameter name
+Parameters:
+  Dbusername:
+    AllowedPattern: ^[a-z0-9]{5,12}$
+    Type: String
+    Default: alice
+    Description: Value to be passed to the ssm parameter
+
+Resources:
+  BasicParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: dbusername
+      Type: String
+      Value: !Ref Dbusername
+      Description: SSM parameter for database username
+
+  DemoRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: ssm-least-privilege
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ssm:GetParameter
+                Resource: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${BasicParameter}
+                #defining pseudo parameters which are pre-defined by cloudformation 
+                #eg: AWS::Partition,AWS::Region,AWS::AccountId
+  LamFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Role: !GetAtt DemoRole.Arn
+      Runtime: python3.8
+      Code:
+        ZipFile: |
+          import boto3
+          client = boto3.client('ssm')
+          def lambda_handler(event, context):
+               response = client.get_parameter(Name='dbusername')
+               print(f'SSM dbUsername parameter value: {response["Parameter"]["Value"]}')

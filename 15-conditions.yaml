@@ -1,0 +1,67 @@
+Metadata: 
+  AWS::CloudFormation::Interface:
+        ParameterGroups: 
+            - Label: 
+                Default: Environment configurations
+              Parameters: 
+               - EnvironmentType
+               
+           
+            - Label: 
+                Default: EC2 configurations 
+              Parameters: 
+               - InstanceType 
+               - AmiId
+
+Parameters: 
+  EnvironmentType: 
+    Type: String 
+    Default: Test
+    Description: Environment to Deployment 
+    AllowedValues: 
+       - Dev 
+       - Test
+       - Int 
+       - Prod 
+    ConstraintDescription: Specify The environment
+  InstanceType: 
+    Type: String 
+    Default: t3.micro 
+    Description: Size of instance to launch
+    AllowedValues: 
+      - t3.micro 
+      - t3.medium 
+      - t3.large 
+  AmiId: 
+   Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+   Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+   Description: Type of OS to launch
+
+Conditions: 
+  IsProduction: !Equals 
+     - !Ref  EnvironmentType 
+     - Prod
+
+
+Resources:
+  Ec2Instance: 
+     Type: AWS::EC2::Instance 
+     Properties: 
+       InstanceType: !Ref  InstanceType
+       ImageId: !Ref  AmiId
+    
+  Volume:  
+    Type: AWS::EC2::Volume
+    Properties: 
+      Size: 2 
+      AvailabilityZone: !GetAtt  Ec2Instance.AvailabilityZone
+      Encrypted: true 
+    Condition: IsProduction
+
+  MountPoint: 
+    Type: AWS::EC2::VolumeAttachment
+    Properties:
+      InstanceId: !Ref Ec2Instance
+      VolumeId: !Ref Volume 
+      Device: /dev/sdh
+    Condition: IsProduction

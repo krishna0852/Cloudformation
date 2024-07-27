@@ -1,0 +1,23 @@
+Metadata: 
+  AWS::CloudFormation::Interface: 
+          ParameterGroups: 
+               - label: 
+                   Default: 's3-Bucket configurations'
+                 Parameters: 
+                    - BucketName
+          ParameterLabels: 
+             BucketName: 
+                Default: provide Bucket name to create
+
+Parameters: 
+  BucketName: 
+    Type: String
+    Default: demo 
+    Description: Bucket name 
+
+Resources: 
+   S3bucket: 
+      Type: AWS::S3::Bucket
+      Properties: 
+        BucketName: !Sub '${BucketName}-${AWS::Region}-${AWS::AccountId}'
+     

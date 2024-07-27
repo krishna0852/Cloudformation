@@ -1,0 +1,42 @@
+Resources:
+  DemoRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: ssm-least-privilege
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ssm:GetParameter
+                Resource: "*"
+                #defining pseudo parameters which are pre-defined by cloudformation 
+                #eg: AWS::Partition,AWS::Region,AWS::AccountId
+  LamFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Environment: 
+        Variables: 
+           RDS_HOSTNAME: '{{resolve:secretsmanager:DatabaseConnParams:SecretString:RDS_HOSTNAME}}'
+           RDS_PORT: '{{resolve:secretsmanager:DatabaseConnParams:SecretString:RDS_PORT}}'
+      Role: !GetAtt DemoRole.Arn
+      Runtime: python3.8
+      Code:
+        ZipFile: |
+          import os
+          def lambda_handler(event, context):
+               DB_Port = os.environ['RDS_PORT']
+               DB_HostName = os.environ['RDS_HOSTNAME']
+               print(f'RDS Host value: {DB_HostName}')
+               print(f'RDS PORT value: {DB_Port}')
