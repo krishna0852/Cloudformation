@@ -1,0 +1,42 @@
+Parameters:
+  EnvironmentType:
+    Description: 'Specify the Environment type of the stack.'
+    Type: String
+    Default: Test
+    AllowedValues:
+     - Dev
+     - Test
+     - Prod
+    ConstraintDescription: 'Specify either Dev, Test or Prod.' 
+
+Resources: 
+ ec2Instance:
+   Type: AWS::EC2::Instance
+   Properties: 
+    InstanceType: t3.micro
+    ImageId: ami-04a81a99f5ec58529 
+    IamInstanceProfile: !ImportValue workshop-instanceProfile
+    SubnetId: !ImportValue workshop-publc2sbntid
+    Tags: 
+     - Key: Environment 
+       Value: !Ref EnvironmentType
+ SGroup:
+   Type: AWS::EC2::SecurityGroup
+   Properties:
+    GroupDescription: Enable HTTP and HTTPS access
+    SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+    SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+    VpcId: !ImportValue workshop-vpcid
+
