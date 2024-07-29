@@ -1,0 +1,52 @@
+Parameters:
+  EnvironmentType:
+    Description: 'Specify the Environment type of the stack.'
+    Type: String
+    Default: Test
+    AllowedValues:
+     - Dev
+     - Test
+     - Prod
+    ConstraintDescription: 'Specify either Dev, Test or Prod.' 
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: 'The VPC ID'
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: 'The Subnet ID'
+  WebServerInstanceProfile:
+    Type: String
+    Description: 'Instance profile resource ID'
+
+Resources: 
+ ec2Instance:
+   Type: AWS::EC2::Instance
+   Properties: 
+    InstanceType: t3.micro
+    ImageId: ami-04a81a99f5ec58529 
+    IamInstanceProfile: !Ref WebServerInstanceProfile
+    SubnetId: !Ref SubnetId
+    Tags: 
+     - Key: Environment 
+       Value: !Ref EnvironmentType
+ SGroup:
+   Type: AWS::EC2::SecurityGroup
+   Properties:
+    GroupDescription: Enable HTTP and HTTPS access
+    SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+    SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+    VpcId: !Ref VpcId
+
