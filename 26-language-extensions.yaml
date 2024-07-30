@@ -49,3 +49,11 @@ Outputs:
   InstanceId:
     Description: The ID of the newly-created EC2 instance.
     Value: !Ref EC2Instance
+
+
+# explaination:
+
+#Complex JSON Structures:
+
+#CloudWatch Dashboards use JSON to define complex configurations for visualizing metrics, alarms, and other widgets. This JSON structure can be intricate, often involving nested arrays and objects.
+#YAML doesn’t natively support all the intricacies of the JSON format, especially when it comes to escaping characters and formatting complex nested structures. Using Fn::ToJsonString ensures that these JSON configurations are correctly formatted and embedded in the CloudFormation template.
