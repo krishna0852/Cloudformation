@@ -39,3 +39,31 @@ aws cloudformation deploy \
 --stack-name cfn-workshop-package-deploy-lambda \
 --region us-east-1 \
 --capabilities CAPABILITY_IAM
+
+============
+
+
+Cloudformation Topics: 
+============================
+
+Parameters 
+metadata
+InternsicFunctions  (!Ref, !Sub !GetAtt)
+Psuedo paramers 
+output 
+mappings 
+return values 
+conditions
+Dynamic Reference 
+depennds on 
+Language extensions 
+nested stacks 
+cross stacks 
+package&deploy 
+foreach 
+architect templates 
+changeset 
+stack-policies-prevention 
+resource import
+
+
