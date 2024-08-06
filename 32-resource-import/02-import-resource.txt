@@ -1,0 +1,9 @@
+[
+  {
+    "ResourceType":"AWS::SNS::Topic",
+    "LogicalResourceId":"SNSTopic1",
+    "ResourceIdentifier": {
+      "TopicArn":"arn:aws:sns:us-east-1:730335449261:first-topic-console"
+    }
+  }
+]
